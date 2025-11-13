@@ -1,0 +1,74 @@
+openapi: 3.0.3
+info:
+  title: Prices API
+  description: API for managing prices
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local server
+paths:
+  /prices:
+    get:
+      summary: Get applicable prices
+      operationId: getPrices
+      parameters:
+        - name: applicationDate
+          in: query
+          required: false
+          description: Date and time when the price should be applied
+          schema:
+            type: string
+            format: date-time
+        - name: productId
+          in: query
+          required: false
+          description: Identifier of the product
+          schema:
+            type: integer
+        - name: brandId
+          in: query
+          required: false
+          description: Identifier of the brand (chain)
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PriceResponse'
+        '404':
+          description: No applicable price found for the given parameters
+        '400':
+          description: Invalid input parameters
+
+components:
+  schemas:
+    PriceResponse:
+      type: object
+      properties:
+        productId:
+          type: integer
+          example: 35455
+        brandId:
+          type: integer
+          example: 1
+        priceList:
+          type: integer
+          description: Identifier of the applicable price rate
+          example: 2
+        startDate:
+          type: string
+          format: date-time
+          example: 2020-06-14T15:00:00Z
+        endDate:
+          type: string
+          format: date-time
+          example: 2020-06-14T18:30:00Z
+        price:
+          type: number
+          format: double
+          example: 25.45
