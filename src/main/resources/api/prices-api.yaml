@@ -37,8 +37,6 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
                   $ref: '#/components/schemas/PriceResponse'
         '404':
           description: No applicable price found for the given parameters
@@ -72,3 +70,10 @@ components:
           type: number
           format: double
           example: 25.45
+        priority:
+          type: integer
+          description: Price application disambiguator. If two rates coincide within a date range, the one with the highest priority (highest numerical value) is applied.
+          example: 1
+        currency:
+            type: string
+            example: EUR

@@ -2,34 +2,37 @@ package com.example.prices.infrastructure.controller;
 
 import com.company.prices.api.PricesApi;
 import com.company.prices.api.model.PriceResponse;
-import com.example.prices.application.service.PriceService;
+import com.example.prices.application.services.PriceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.OffsetDateTime;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 @RestController
 public class PricesController implements PricesApi {
 
-    private PriceService priceService;
+    private final PriceService priceService;
 
     @Autowired
     public PricesController(PriceService priceService) {
         this.priceService = priceService;
     }
+
     @Override
-    public ResponseEntity<List<PriceResponse>> getPrices(
-            OffsetDateTime applicationDate,
+    public ResponseEntity<PriceResponse> getPrices(
+            LocalDateTime applicationDate,
             Integer productId,
             Integer brandId) {
+        Optional<PriceResponse> priceResponse = priceService.getPriceFiltered(applicationDate, productId, brandId);
 
-        PricesResponse pricesResponse =this.getPricesService(applicationDate, productId, brandId);
-        if (CollectionUtils.isEmpty(pricesResponse.getPricesDtos())) {
-            return ResponseEntity.noContent().build();
+        if (priceResponse.isEmpty()) {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(pricesResponse);
+
+        return priceResponse
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }
